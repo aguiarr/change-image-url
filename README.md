@@ -5,8 +5,6 @@ Author: Matheus Aguiar <br/>
 Author URL: https://github.com/aguiarr <br/>
 Author Email: aguiartgv@gmail.com <br/>
 Contributors: aguiarr  <br/> 
-Tested up to: 1.0.0  <br/>
-Stable tag: 1.0.0  <br/>
 
 ## How to use:
 
@@ -21,5 +19,5 @@ There will always be one or other that fails in the update because not all image
 
 ## Installation
 
-Open menu Settings -> Change Image URL
+Open menu Tools -> Change Image URL
 

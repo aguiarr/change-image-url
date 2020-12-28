@@ -5,7 +5,7 @@
  *Author: Matheus Aguiar
  *Author URI: https://github.com/aguiarr
  *Author Email: aguiartgv@gmail.com
- *Version: 1.0.0
+ *Version: 1.0.1
  *License: GPLv3
  *Text Domain: change-image-url
  */
@@ -19,30 +19,27 @@ function add_management_page_change_image_url(){
   add_management_page("Change image URL", "Change image URL", "manage_options", basename(__FILE__), "change_image_url_management_page");
 }
 
-//pega as images do textarea e transforma em array
+//take the textarea images and transform it into an array
 function get_images($images){
   $imagesArray = explode(';', $images);
 
   return $imagesArray;
 }
 
-//retornar o thumb_id com base na url
+//return thumb_id based on url
 function get_post_id($url_image){
-  try{
 
-    if(!$url_image || $url_image == '') return;
+    if(!$url_image || $url_image == '') {
+      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('There was an error with the passed URLs. ').'</p></strong></div>';
+    }
     $query = "SELECT post_id FROM {$GLOBALS['wpdb']->prefix}postmeta WHERE meta_value = '$url_image';";
     $post_id = $GLOBALS['wpdb']->get_results($query);
 
-    return $post_id;
-
-  }catch(Exception $e){
-    $error++;
-    array_push($erros_post_id, $url_image);
-    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('Houve erros ao buscar o post_id de algumas imagens').'</p></strong></div>';
-
-  }
-
+    if(empty($post_id)){ 
+    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('There were errors when fetching the post_id of some images').'</p></strong></div>';
+    }else{
+      return $post_id;
+    }
 }
 
 
@@ -61,23 +58,16 @@ function urls(){
 
     
   }catch(Exception $e){
-    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('Houve erros ao buscar o thumbnail_id de algumas imagens.').'</p></strong></div>';
+    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('There were errors when fetching the thumbnail_id of some images.').'</p></strong></div>';
   }
 }
 
-//deleta os posts das imagens 
+//delete image posts
 function delete_post($post_id, $url){
-
   $result = $GLOBALS['wpdb']->delete($GLOBALS['wpdb']->prefix . "posts", array("ID" => "$post_id"));
-
-  if(!$result){
-    $error++;
-    array_push($erros_post_id, $url);
-    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('Não foi possível deletar algumas das urls passadas da tabela '. $GLOBALS['wpdb']->prefix .'posts.').'</p></strong></div>';
-  }
 }
 
-//deleta a thumbnail do post_meta
+//delete the post_meta thumbnail
 function delete_thumbnail($thum_id, $url){
 
   $result = $GLOBALS['wpdb']->delete($GLOBALS['wpdb']->prefix . "postmeta", array("post_id" => "$thum_id"));
@@ -86,7 +76,7 @@ function delete_thumbnail($thum_id, $url){
   return $result;
 }
 
-//altera o id da thumb
+//change the thumb id
 function update_thumb_id($old_id, $new_id, $url){
 
   if($old_id == null || $old_id == '') return;
@@ -99,7 +89,6 @@ function update_thumb_id($old_id, $new_id, $url){
 
 function check_array_url($images){
   $array = [];
-  try{
 
     if($images[count($images)] == ''){
       array_pop($images);
@@ -109,24 +98,20 @@ function check_array_url($images){
 
       $array[] = $item;
     }
-
-    return $array;
-
-  }
-
-  catch(Exeption $e){
-    $error++;
-    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('As URLs das imagens foram inseridas no formato errado').'</p></strong><p>'.__('As URLs devem ser separadas por ";".').'</p></div>';
-  }
-   
+    if(empty($array)) {
+      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('Image URLs were entered in the wrong format').'</p></strong><p>'.__('URLs must be separated by ";".').'</p></div>';
+    }
+    else{
+        return $array;
+    }
 }
+
 
 function check_id($id){
   if(intval($id)){
     return true;
   }else{
-    $error++;
-    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('O valor inserido no campo "ID da nova imagem" não é válido').'</p></strong><p>'.__('Para esse campo entre com um valor inteiro.').'</p></div>';
+    echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('The value entered in the "New image ID" field is not valid').'</p></strong><p>'.__('For this field, enter an integer value.').'</p></div>';
   }
 }
 
@@ -144,15 +129,13 @@ function change_image_url_management_page(){
       check_id($imageId);
       
     }else{
-      $error++;
-      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('O valor inserido no campo "ID da nova imagem" não é válido').'</p></strong><p>'.__('Por favor entre com um valor válido.').'</p></div>';
+      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('The value entered in the "New Image ID" field is not valid').'</p></strong><p>'.__('Please enter a valid value.').'</p></div>';
     }
 
     if( isset( $_POST['listaImages'] ) && $_POST['listaImages'] != '' ){
       $imageList = $_POST['listaImages'];
     }else{
-      $error++;
-      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('O valor inserido no campo "Lista de Imagens" não é válido').'</p></strong><p>'.__('Por favor entre com um valor válido.').'</p></div>';
+      echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('The value entered in the "Image List" field is not valid').'</p></strong><p>'.__('Please enter a valid value.').'</p></div>';
     }
 
 
@@ -160,38 +143,41 @@ function change_image_url_management_page(){
 
 
     foreach ($images as $image) {
-    $thumb_id = get_post_id($image)[0]->post_id;
-    
+      $thumb_id = get_post_id($image)[0]->post_id;
+      
 
-    if(update_thumb_id($thumb_id,$imageId, $image) == false){
-      $erros[] = $image . " - UPDATE";
-    }else{
-      $success[] = $image . " - UPDATE";
-
-      if(delete_thumbnail($thumb_id, $image) == false){
-        $erros[] = $image . " - DELETE";
+      if(update_thumb_id($thumb_id,$imageId, $image) == false){
+        $erros[] = $image . " - UPDATE";
       }else{
         $success[] = $image . " - UPDATE";
+
+        if(delete_thumbnail($thumb_id, $image) == false){
+          $erros[] = $image . " - DELETE";
+        }else{
+          $success[] = $image . " - UPDATE";
+        }
       }
     }
+      if(!empty($erros))  echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('There was an error in any of the processes, please check the logs').'</p></strong></div>';
   }
-}
+
+
 
   ?>
-  <div">
+  <div>
     <h2 >Change Image URL</h2>
     <form method="post" action="tools.php?page=<?php echo basename(__FILE__);?>">
       <div>
         <strong>
-          <?php _e('ID da nova imagem'); ?>
+          <?php _e('New Image ID'); ?>
         </strong><br>
         <input name="imagemId" type="text" id="imagemId" style="width:100px;font-size:20px;" >
         <br>
         <div>
           <strong>
-            <label>Lista de Imagens</label>
+            <label>Image List</label>
           </strong>
-          <label style="color=gray">(listar imagens separadas por ";")</label>
+          <label style="color=gray">(list images separated by ";")</label>
           </br>
           <td><textarea name="listaImages" type="text" id="listaImages" placeholder="Ex: imagem-teste.png;imagem-teste2.jpg;imagem-teste3.jpeg;" style="width:650px;height:300px;font-size:15px;"></textarea></td>
         </div>
@@ -201,14 +187,14 @@ function change_image_url_management_page(){
     </form>
     <div>
       <strong>
-        <label>URLs alteradas com sucesso:</label>
+        <label>Successfully changed URLs:</label>
       </strong>
       </br>
-      <td><textarea name="success" type="text" readonly id="success" style="width:650px;height:100px;font-size:15px;"><?php if(empty($erros)) echo ''; foreach($success as $succes){ echo $succes . "\n";}?></textarea></td>
+      <td><textarea name="success" type="text" readonly id="success" style="width:650px;height:100px;font-size:15px;color:green;"><?php if(empty($erros)) echo ''; foreach($success as $succes){ echo $succes . "\n";}?></textarea></td>
     </div>
     <div>
       <strong>
-        <label>URLs não alteradas:</label>
+        <label>Unchanged URLs:</label>
       </strong>
       </br>
       <td><textarea name="erros" type="text" readonly id="erros"  style="width:650px;height:100px;font-size:15px;"><?php if(empty($erros)) echo ''; foreach($erros as $erro){ echo $erro . "\n";}?></textarea></td>
