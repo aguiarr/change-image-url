@@ -1,12 +1,12 @@
 # Change Images URL
 This plugin changes the images listed for a new inserted image and delete the old images;
 
-Author: Matheus Aguiar
-Author URL: https://github.com/aguiarr
-Author Email: aguiartgv@gmail.com
-Contributors: aguiarr  
-Tested up to: 1.0.0  
-Stable tag: 1.0.0  
+Author: Matheus Aguiar <br/>
+Author URL: https://github.com/aguiarr <br/>
+Author Email: aguiartgv@gmail.com <br/>
+Contributors: aguiarr  <br/> 
+Tested up to: 1.0.0  <br/>
+Stable tag: 1.0.0  <br/>
 
 ## How to use:
 
