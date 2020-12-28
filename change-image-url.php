@@ -42,10 +42,14 @@ function change_image_url_management_page(){
       echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('The value entered in the "Image List" field is not valid').'</p></strong><p>'.__('Please enter a valid value.').'</p></div>';
     }
 
+    if( isset( $_POST['deleteImages'] ) && $_POST['deleteImages'] != '' ){
+      $checkBox = $_POST['deleteImages'];
+    }
+
 
     $images = check_array_url(get_images($imageList));
 
-
+    if($checkBox == on)var_dump("Sua mae!");
     foreach ($images as $image) {
       $thumb_id = get_post_id($image)[0]->post_id;
       
@@ -55,12 +59,24 @@ function change_image_url_management_page(){
       }else{
         $success[] = $image . " - UPDATE";
 
+        if($checkBox != on){
+          if(delete_thumbnail($thumb_id, $image) == false){
+            $erros[] = $image . " - DELETE";
+          }else{
+            $success[] = $image . " - UPDATE";
+          }
+
+        }
+      }
+
+      if($checkBox == on){
         if(delete_thumbnail($thumb_id, $image) == false){
           $erros[] = $image . " - DELETE";
         }else{
           $success[] = $image . " - UPDATE";
         }
       }
+      
     }
       if(!empty($erros))  echo '<div id="message" class="error"><p><strong>'.__('ERROR').' - '.__('There was an error in any of the processes, please check the logs').'</p></strong></div>';
   }
@@ -68,7 +84,9 @@ function change_image_url_management_page(){
 
 
   ?>
-  <div>
+  <div id="message" class="notice"><p><strong><?=__('Change Image URL | Notice').' - '.__('Notes about the plugin.').'</p></strong><p>'.__('1. Enter the new image ID in the "New Image ID" field;') . '<br>' . __('2. Insert a list of URLs (Ex: 2020/12 / test-image.png) separated by ";" in the "Image List" field;')?></p></div>
+  <div id="message" class="notice notice-warning"><p><strong><?=__('Change Image URL | WARNING').' : '.__('We recommend that you make a backup of your database before using the plugin.');?></strong></p></div>
+  <div style="margin-left:10px;">
     <h2 >Change Image URL</h2>
     <form method="post" action="tools.php?page=<?php echo basename(__FILE__);?>">
       <div>
@@ -86,8 +104,12 @@ function change_image_url_management_page(){
           <td><textarea name="listaImages" type="text" id="listaImages" placeholder="Ex: image-test.png;image-test2.jpg;image-test3.jpeg;" style="width:650px;height:300px;font-size:15px;"></textarea></td>
         </div>
       </div>
+      <div style="margin-top:20px;">
+        <input name="deleteImages" type="checkbox" id="deleteImages"/>
+        <label for="deleteImages"><strong>Also delete images whose IDs are not updated.</strong></label>
+      </div>
       <br/>
-      <input class="button-primary" style="margin-left: 550px;"name="btnSubmit" value="<?php _e('Change URLs'); ?>" type="submit" />
+      <input class="button-primary" style="margin-left: 550px;margin-bottom:20px;"name="btnSubmit" value="<?php _e('Change URLs'); ?>" type="submit" />
     </form>
     <div>
       <strong>
