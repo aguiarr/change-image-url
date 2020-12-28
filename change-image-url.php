@@ -186,7 +186,6 @@ function change_image_url_management_page(){
           <?php _e('ID da nova imagem'); ?>
         </strong><br>
         <input name="imagemId" type="text" id="imagemId" style="width:100px;font-size:20px;" >
-        </div>
         <br>
         <div>
           <strong>
