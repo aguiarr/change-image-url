@@ -1,5 +1,4 @@
 <?php
-
 //take the textarea images and transform it into an array
 function get_images($images){
   $imagesArray = explode(';', $images);
@@ -66,7 +65,6 @@ function check_array_url($images){
         return $array;
     }
 }
-
 
 function check_id($id){
   if(intval($id)){

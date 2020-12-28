@@ -5,7 +5,7 @@
  *Author: Matheus Aguiar
  *Author URI: https://github.com/aguiarr
  *Author Email: aguiartgv@gmail.com
- *Version: 1.0.1
+ *Version: 1.0.2
  *License: GPLv3
  *Text Domain: change-image-url
  */

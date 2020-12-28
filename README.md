@@ -1,4 +1,5 @@
 # Change Images URL
+Version: 1.0.2
 This plugin changes the images listed for a new inserted image and delete the old images;
 
 Author: Matheus Aguiar <br/>
